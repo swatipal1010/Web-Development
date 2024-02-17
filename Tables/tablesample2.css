@@ -1,0 +1,43 @@
+table{
+    border:solid 3px #3f2b21;
+    border-collapse: collapse;
+  }
+  
+  td, th{
+    padding: 0.5rem;
+    border-bottom: 1px solid #ccae51;
+  }
+  
+  tfoot tr:last-child td{
+    border:none;
+  }
+  
+  caption{
+    font-weight: bold;
+    text-align: left;
+    font-size: 2rem;
+    padding: 1rem 0;
+    color: #ccae51;
+  }
+  
+  th{
+    text-align:left;
+    background-color:#ccae51;
+    color: white;
+  }
+  
+  thead tr:first-child,thead tr:first-child th{
+    background-color:#3f2b21;
+    text-align: center;
+    border-left: 1px solid white;
+  }
+  
+  tfoot tr{
+    background-color: #3f2b21;
+    color: white;
+    font-weight:bold;
+  }
+  
+  tbody tr:nth-child(even){
+    background-color: rgba(204, 174, 81, 0.3);
+  }

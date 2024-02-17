@@ -1,0 +1,37 @@
+table{
+    border-collapse: collapse;
+  }
+  tbody td{
+    background-color:rgba(137, 196, 244,0.3);
+    border: 2px solid black;
+  }
+  th{
+    background-color: #044F67;
+    color: white;
+    border: 2px solid black;
+    padding: 0.3rem;
+  }
+  
+  td{
+    padding:0.5rem;
+  }
+  
+  caption{
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-align: left;
+  }
+  
+  tfoot td{
+    text-align: left;
+    background-color:rgba(93, 140, 174,0.5);
+    border: 2px solid black;
+  }
+  
+  tfoot tr td:first-child{
+    border:none;
+    background-color:white;
+  }
+  tfoot{
+    border-top: 5px solid black;;
+  }
