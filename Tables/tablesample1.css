@@ -35,3 +35,53 @@ table{
   tfoot{
     border-top: 5px solid black;;
   }
+
+  .tablescroll{
+    overflow: auto;
+  }
+
+  @media (max-width: 600px) {
+    table{
+      border:none;
+    }
+    table,tr,td{
+      display: block;
+    }
+    thead, th{
+      display: none;
+    }
+    td:nth-child(1)::before{
+      content:"Day: ";
+    }
+    td:nth-child(2)::before{
+      content:"Date: ";
+    }
+    td:nth-child(3)::before{
+      content:"Regular Hours: ";
+    }
+    td:nth-child(4)::before{
+      content:"Overtime Hours: ";
+    }
+    td:nth-child(5)::before{
+      content:"Sick Hours: ";
+    }
+    td:nth-child(6)::before{
+      content:"Vacation Hours: ";
+    }
+    td:nth-child(7)::before{
+      content:"Total Hours: ";
+    }
+
+    tfoot tr:first-child td:first-child::before{
+      content:"Total hours in the following categories: ";
+    }
+    tfoot tr:nth-child(2) td:first-child::before{
+      content:"Rates of pay in the following categories: ";
+    }
+    tfoot tr:nth-child(2) td:last-child{
+      display:none;
+    }
+    tfoot tr:last-child td:last-child::before{
+      content: "Total owed in the following categories: ";
+    }
+  }
