@@ -94,6 +94,20 @@ app.post('/person',async(req,res)=>{
   }
 });
 
+
+//GET method to retrieve the data of the Person
+app.get('/person',async(req,res)=>{
+  try{
+    const data = await Person.find();
+    console.log('Data fetched');
+    res.status(200).json(data); 
+  }catch{
+    console.log(err);
+    res.status(500)({error: 'Internal server error'});
+  }
+})
+
+
 app.listen(3000, ()=>{
   console.log("Server is running on port 3000");
 })
