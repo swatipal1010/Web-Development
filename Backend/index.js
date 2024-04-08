@@ -10,11 +10,11 @@
 
 
 // const jsonString = '{"name":"Swati", "age":15, "City":"Dehradun"}';
-// const jsonObj = JSON.parse(jsonString);               // Parsing the JSON string into a JavaScript object
-// console.log(jsonObj.name);                            // Accessing the name property of the parsed object
+// const jsonObj = JSON.parse(jsonString);                              // Parsing the JSON string into a JavaScript object
+// console.log(jsonObj.name);                                           // Accessing the name property of the parsed object
 
 // const objToConvert = {name:"Swati", age:25, City:"Dehradun"};
-// const jsonobj = JSON.stringify(objToConvert);
+// const jsonobj = JSON.stringify(objToConvert);                    //coverting JSON to string
 // console.log(jsonobj);
 
 
@@ -22,11 +22,21 @@
 const express = require('express')
 const app = express()
 const db = require('./db')                          //Connection of nodejs with mongodb
+
 const Person = require('./models/Person');
+const SignUp = require('./models/SignUp');
+const MenuItem = require('./models/MenuItem');
+const SignIn = require('./models/SignIn');
+
+// const SignIn = require('./models/SignIn');
+// const SignUp = require('./models/SignUp');
+
 
 const bodyParser = require('body-parser'); 
 app.use(bodyParser.json());               //body parser extracts the json data from the body of the client request and converts it to object and store it in req.body
 
+
+/*
 app.get('/', function (req, res) {
   res.send('Hello World')
 })
@@ -47,7 +57,9 @@ app.get('/history', (req,res)=>{
 app.post('/items',(req, res)=>{
   res.send("Data is saved.");
 })
+*/
 
+//End-Points requests for 'Person' details --> GET and POST method
 
 //POST route to add a person
 /* 
@@ -98,8 +110,115 @@ app.post('/person',async(req,res)=>{
 //GET method to retrieve the data of the Person
 app.get('/person',async(req,res)=>{
   try{
-    const data = await Person.find();
-    console.log('Data fetched');
+    const data = await Person.find();                 //all documents are retrieved from 'Person' collection
+    console.log('Data fetched from Person collection');
+    res.status(200).json(data); 
+  }catch{
+    console.log(err);
+    res.status(500)({error: 'Internal server error'});
+  }
+})
+
+
+//End-Point requests using GET and POST method
+app.post('/menuitems', async (req,res)=>{
+        try{
+          const data = req.body
+          const newItem = new MenuItem(data);
+          const response = await newItem.save()    //wait until the data is saved and then save the response(either success or failure) in the 'response' 
+          console.log('Response saved');
+          res.status(200).json(response);
+        }catch(err){
+          console.log(err);
+          res.status(500)({error: 'Internal server error'});
+        }
+})
+
+app.get('/menuitems', async(req,res)=>{
+        try{
+          const data = await MenuItem.find();                 //all documents are retrieved from 'MenuItem' collection
+          console.log('Data fetched from MenuItems collection');
+          res.status(200).json(data); 
+        }catch{
+          console.log(err);
+          res.status(500)({error: 'Internal server error'});
+        }
+})
+
+/*
+app.get('/person/:workType',async(req,res)=>{
+      try{
+        const workType = req.params.workType;  //Extract workType from the request URL paramater and store it in a variable 'worType'
+        if(workType=='chef' || workType=='waiter' || workType == 'manager'){
+
+        }else{
+          res.status(404).json({error:'Invalid work type'});
+        }
+      }catch(err){
+
+      }
+        
+})
+*/
+
+
+
+
+
+
+
+//SIGNUP
+//POST method to store the signup details of the customer and seller
+app.post('/signUp',async(req,res)=>{
+  try{
+    const data = req.body
+    const newPerson = new SignUp(data);
+    const response = await newPerson.save()    //wait until the data is saved and then save the response(either success or failure) in the 'response' 
+    console.log('Response saved');
+    res.status(200).json(response);           //response is returned in json format
+  }
+  catch(err){
+    console.log(err);
+    res.status(500)({error: 'Internal server error'});
+  }
+});
+
+
+//GET method to retrieve the data of the Seller or Customer
+app.get('/signUp',async(req,res)=>{
+  try{
+    const data = await SignUp.find();                 //all documents are retrieved from 'Person' collection
+    console.log('Data fetched from Person collection');
+    res.status(200).json(data); 
+  }catch{
+    console.log(err);
+    res.status(500)({error: 'Internal server error'});
+  }
+})
+
+
+//SIGNIN
+//POST method to store the signup details of the customer and seller
+app.post('/signUp',async(req,res)=>{
+  try{
+    const data = req.body
+    const newPerson = new SignUp(data);
+    const response = await newPerson.save()    //wait until the data is saved and then save the response(either success or failure) in the 'response' 
+    console.log('Response saved');
+    res.status(200).json(response);           //response is returned in json format
+  }
+  catch(err){
+    console.log(err);
+    res.status(500)({error: 'Internal server error'});
+  }
+});
+
+
+//GET method to retrieve the data of the Seller or Customer
+app.get('/signUp',async(req,res)=>{
+  try{
+    const data = await SignUp.find();                 //all documents are retrieved from 'Person' collection
+    console.log('Data fetched from Person collection');
     res.status(200).json(data); 
   }catch{
     console.log(err);
