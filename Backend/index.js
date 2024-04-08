@@ -199,10 +199,10 @@ app.get('/signUp',async(req,res)=>{
 
 //SIGNIN
 //POST method to store the signup details of the customer and seller
-app.post('/signUp',async(req,res)=>{
+app.post('/signIn',async(req,res)=>{
   try{
     const data = req.body
-    const newPerson = new SignUp(data);
+    const newPerson = new SignIn(data);
     const response = await newPerson.save()    //wait until the data is saved and then save the response(either success or failure) in the 'response' 
     console.log('Response saved');
     res.status(200).json(response);           //response is returned in json format
@@ -215,9 +215,9 @@ app.post('/signUp',async(req,res)=>{
 
 
 //GET method to retrieve the data of the Seller or Customer
-app.get('/signUp',async(req,res)=>{
+app.get('/signIn',async(req,res)=>{
   try{
-    const data = await SignUp.find();                 //all documents are retrieved from 'Person' collection
+    const data = await SignIn.find();                 //all documents are retrieved from 'Person' collection
     console.log('Data fetched from Person collection');
     res.status(200).json(data); 
   }catch{
