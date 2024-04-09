@@ -122,12 +122,14 @@ const personRoutes = require('./routes/personRoutes');
 const signInRoutes = require('./routes/signInRoutes');
 const signUpRoutes = require('./routes/signUpRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const uploadItemRoutes = require('./routes/uploadItemRoutes');
 
 //Use the routers
 app.use('/person', personRoutes);
 app.use('/SignIn', signInRoutes);
 app.use('/SignUp', signUpRoutes);
 app.use('/Profile',profileRoutes);
+app.use('/UploadItem',uploadItemRoutes);
 
 
 app.listen(3000, ()=>{

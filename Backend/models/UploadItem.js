@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-const mongoose = require('mongoose');
-
 // Define the schema for auction items
 const auctionItemSchema = new mongoose.Schema({
     seller: {
