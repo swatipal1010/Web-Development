@@ -23,17 +23,14 @@ const express = require('express')
 const app = express()
 const db = require('./db')                          //Connection of nodejs with mongodb
 
-const Person = require('./models/Person');
-const SignUp = require('./models/SignUp');
-const MenuItem = require('./models/MenuItem');
-const SignIn = require('./models/SignIn');
-
-// const SignIn = require('./models/SignIn');
+// const Person = require('./models/Person');
+// const MenuItem = require('./models/MenuItem');
 // const SignUp = require('./models/SignUp');
+// const SignIn = require('./models/SignIn');
 
 
 const bodyParser = require('body-parser'); 
-app.use(bodyParser.json());               //body parser extracts the json data from the body of the client request and converts it to object and store it in req.body
+app.use(bodyParser.json());                     //body parser extracts the json data from the body of the client request and converts it to object and store it in req.body
 
 
 /*
@@ -91,33 +88,7 @@ newPerson.save((error, savedPerson) => {
 }) 
 }); */
 
-//Using async and await
-app.post('/person',async(req,res)=>{
-  try{
-    const data = req.body
-    const newPerson = new Person(data);
-    const response = await newPerson.save()    //wait until the data is saved and then save the response(either success or failure) in the 'response' 
-    console.log('Response saved');
-    res.status(200).json(response);           //response is returned in json format
-  }
-  catch(err){
-    console.log(err);
-    res.status(500)({error: 'Internal server error'});
-  }
-});
 
-
-//GET method to retrieve the data of the Person
-app.get('/person',async(req,res)=>{
-  try{
-    const data = await Person.find();                 //all documents are retrieved from 'Person' collection
-    console.log('Data fetched from Person collection');
-    res.status(200).json(data); 
-  }catch{
-    console.log(err);
-    res.status(500)({error: 'Internal server error'});
-  }
-})
 
 
 //End-Point requests using GET and POST method
@@ -145,89 +116,33 @@ app.get('/menuitems', async(req,res)=>{
         }
 })
 
-/*
-app.get('/person/:workType',async(req,res)=>{
-      try{
-        const workType = req.params.workType;  //Extract workType from the request URL paramater and store it in a variable 'worType'
-        if(workType=='chef' || workType=='waiter' || workType == 'manager'){
 
-        }else{
-          res.status(404).json({error:'Invalid work type'});
-        }
-      }catch(err){
+//Import the router files
+const personRoutes = require('./routes/personRoutes');
+const signInRoutes = require('./routes/signInRoutes');
+const signUpRoutes = require('./routes/signUpRoutes');
+const profileRoutes = require('./routes/profileRoutes');
 
-      }
-        
-})
-*/
-
-
-
-
-
-
-
-//SIGNUP
-//POST method to store the signup details of the customer and seller
-app.post('/signUp',async(req,res)=>{
-  try{
-    const data = req.body
-    const newPerson = new SignUp(data);
-    const response = await newPerson.save()    //wait until the data is saved and then save the response(either success or failure) in the 'response' 
-    console.log('Response saved');
-    res.status(200).json(response);           //response is returned in json format
-  }
-  catch(err){
-    console.log(err);
-    res.status(500)({error: 'Internal server error'});
-  }
-});
-
-
-//GET method to retrieve the data of the Seller or Customer
-app.get('/signUp',async(req,res)=>{
-  try{
-    const data = await SignUp.find();                 //all documents are retrieved from 'Person' collection
-    console.log('Data fetched from Person collection');
-    res.status(200).json(data); 
-  }catch{
-    console.log(err);
-    res.status(500)({error: 'Internal server error'});
-  }
-})
-
-
-//SIGNIN
-//POST method to store the signup details of the customer and seller
-app.post('/signIn',async(req,res)=>{
-  try{
-    const data = req.body
-    const newPerson = new SignIn(data);
-    const response = await newPerson.save()    //wait until the data is saved and then save the response(either success or failure) in the 'response' 
-    console.log('Response saved');
-    res.status(200).json(response);           //response is returned in json format
-  }
-  catch(err){
-    console.log(err);
-    res.status(500)({error: 'Internal server error'});
-  }
-});
-
-
-//GET method to retrieve the data of the Seller or Customer
-app.get('/signIn',async(req,res)=>{
-  try{
-    const data = await SignIn.find();                 //all documents are retrieved from 'Person' collection
-    console.log('Data fetched from Person collection');
-    res.status(200).json(data); 
-  }catch{
-    console.log(err);
-    res.status(500)({error: 'Internal server error'});
-  }
-})
+//Use the routers
+app.use('/person', personRoutes);
+app.use('/SignIn', signInRoutes);
+app.use('/SignUp', signUpRoutes);
+app.use('/Profile',profileRoutes);
 
 
 app.listen(3000, ()=>{
-  console.log("Server is running on port 3000");
+  console.log("Server is running on port 3000"); 
 })
+
+
+
+
+
+
+
+
+
+
+
+
 
