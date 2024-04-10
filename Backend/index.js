@@ -22,6 +22,7 @@
 const express = require('express')
 const app = express()
 const db = require('./db')                          //Connection of nodejs with mongodb
+require ('dotenv').config();
 
 // const Person = require('./models/Person');
 // const MenuItem = require('./models/MenuItem');
@@ -31,6 +32,7 @@ const db = require('./db')                          //Connection of nodejs with 
 
 const bodyParser = require('body-parser'); 
 app.use(bodyParser.json());                     //body parser extracts the json data from the body of the client request and converts it to object and store it in req.body
+const PORT = process.env.PORT || 3000;
 
 
 /*
@@ -123,6 +125,7 @@ const signInRoutes = require('./routes/signInRoutes');
 const signUpRoutes = require('./routes/signUpRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const uploadItemRoutes = require('./routes/uploadItemRoutes');
+const bidRoutes = require('./routes/bidRoutes');
 
 //Use the routers
 app.use('/person', personRoutes);
@@ -130,9 +133,10 @@ app.use('/SignIn', signInRoutes);
 app.use('/SignUp', signUpRoutes);
 app.use('/Profile',profileRoutes);
 app.use('/UploadItem',uploadItemRoutes);
+app.use('/bidrecord', bidRoutes);
 
 
-app.listen(3000, ()=>{
+app.listen(PORT, ()=>{
   console.log("Server is running on port 3000"); 
 })
 

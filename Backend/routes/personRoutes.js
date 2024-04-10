@@ -2,76 +2,94 @@ const express = require('express');
 const router = express.Router();
 const Person = require('./../models/Person');
 
-//Using async and await
-router.post('/',async(req,res)=>{
-    try{
-      const data = req.body
-      const newPerson = new Person(data);
-      const response = await newPerson.save()    //wait until the data is saved and then save the response(either success or failure) in the 'response' 
-      console.log('Response saved');
-      res.status(200).json(response);           //response is returned in json format
+// Using async and await
+router.post('/', async (req, res) => {
+    try {
+        const data = req.body;
+        const newPerson = new Person(data);
+        const response = await newPerson.save();
+        console.log('Response saved');
+        res.status(200).json(response); // Return saved response as JSON
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal server error' }); // Send error response as JSON
     }
-    catch(err){
-      console.log(err);
-      res.status(500)({error: 'Internal server error'});
+});
+
+// GET method to retrieve all data of the Person
+router.get('/', async (req, res) => {
+    try {
+        const data = await Person.find();
+        console.log('Data fetched from Person collection');
+        res.status(200).json(data); // Return fetched data as JSON
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal server error' }); // Send error response as JSON
     }
-  });
+});
 
-
-  //GET method to retrieve the data of the Person
-router.get('/',async(req,res)=>{
-    try{
-      const data = await Person.find();                 //all documents are retrieved from 'Person' collection
-      console.log('Data fetched from Person collection');
-      res.status(200).json(data); 
-    }catch{
-      console.log(err);
-      res.status(500)({error: 'Internal server error'});
+// Get info according to particular role --> PARAMETERIZED CALL
+router.get('/:workType', async (req, res) => {
+    try {
+        const workType = req.params.workType.toLowerCase();
+        if (workType === 'chef' || workType === 'waiter' || workType === 'manager') {
+            const response = await Person.find({ role: workType });
+            console.log('Response fetched');
+            res.status(200).json({ response }); // Return fetched response as JSON
+        } else {
+            res.status(404).json({ error: 'Invalid work type' }); // Send error response as JSON
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal server error' }); // Send error response as JSON
     }
-  })
+});
 
+// PUT METHOD to update a specific person's data
+router.put('/:id', async (req, res) => {
+    try {
+        const personId = req.params.id;
+        const updatedPersonData = req.body;
+        const response = await Person.findByIdAndUpdate(personId, updatedPersonData, {
+            new: true,
+            runValidators: true,
+        });
 
-  //Get info accor. to particular role --> PARAMETERIZED CALL
-router.get('/:workType',async(req,res)=>{     // ':' indicates what follows is a variable
-    try{
-      const workType = req.params.workType.toLowerCase();   //Extract workType from the request URL paramater and store it in a variable 'workType'
-      if(workType=='chef' || workType=='waiter' || workType == 'manager'){      //variable workType can only take values 'chef' or 'waiter' or 'manager'
-        const response = await Person.find({role:workType});
-        console.log('Response fetched');
-        res.status(200).json({response});
-      }else{
-        res.status(404).json({error:'Invalid work type'});
+        if (!response) {
+            return res.status(404).json({ error: 'Person not found' });
+        }
+
+        console.log('Data updated.');
+        res.status(200).json(response); // Return updated response as JSON
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal server error' }); // Send error response as JSON
+    }
+});
+
+// DELETE method to delete a specific person
+// DELETE method to delete a specific person
+router.delete('/:id', async (req, res) => {
+  try {
+      const personId = req.params.id;
+
+      // Validate if the provided ID is a valid ObjectId
+      if (!mongoose.isValidObjectId(personId)) {
+          return res.status(400).json({ error: 'Invalid ID format' });
       }
-    }catch{
-      console.log(err);
-      res.status(500)({error: 'Internal server error'});
-    }
-      
-})
 
-
-//PUT METHOD
-router.put('/:id',async(req,res)=>{      //'id' is the varaiable that stores the unique id that is associated with each record/document
-    try{
-      const personId = req.params.id;                         //Extract the is from the URL paramater
-      const  updatedPersonData = req.body;                    //Updated data for thr person whose id is stored in 'id' variable
-      const response = await Person.findByIdAndUpdate(personId, updatedPersonData,{
-        new : true,                                           //Return the updated document
-        runValidators : true,                                 //Run mongoose validators
-      });
-
-      if(!response){
-        return res.status(404).json({error: 'Person not found'});
+      const response = await Person.findByIdAndDelete(personId);
+      if (!response) {
+          return res.status(404).json({ error: 'Person not found' });
       }
 
-      console.log('Data updated.');
-      res.status(200).json(response);
-     
-    }
-    catch(err){
+      console.log('Data deleted');
+      res.status(200).json({ message: 'Person deleted successfully' });
+  } catch (err) {
       console.log(err);
-      res.status(500)({error: 'Internal server error'});
-    }
-})
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 module.exports = router;
