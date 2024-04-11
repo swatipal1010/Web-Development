@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const SignIn = require('./../models/SignIn');
 
+
 //SIGNIN
 //POST method to store the signup details of the customer and seller
 router.post('/',async(req,res)=>{
@@ -33,7 +34,7 @@ router.get('/',async(req,res)=>{
 
 
   //SELLER or CUSTOMER endPoint for fetchng info entered during signin
-router.get('/:roleType', async(req,res)=>{
+router.get('/:roleType',passport.authenticate('local', { session: false }), async(req,res)=>{
     try{
         const roleType = req.params.roleType;
         if(roleType=='seller' || roleType=='customer'){

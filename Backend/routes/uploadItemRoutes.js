@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const UploadItem = require('./../models/UploadItem');       
+const passport = require('passport');
+
 
 // POST method to save a new item
 router.post('/', async (req, res) => {
@@ -17,7 +19,7 @@ router.post('/', async (req, res) => {
 });
 
 // GET method to retrieve all items
-router.get('/', async (req, res) => {
+router.get('/', passport.authenticate('local', { session: false }), async (req, res) => {
     try {
         const items = await UploadItem.find(); // Retrieve all items from UploadItem collection
         console.log('Items fetched from UploadItem collection');

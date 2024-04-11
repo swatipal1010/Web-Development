@@ -23,6 +23,10 @@ const express = require('express')
 const app = express()
 const db = require('./db')                          //Connection of nodejs with mongodb
 require ('dotenv').config();
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;         //username and passsword strategy
+const SignUp = require('./models/SignUp');
+
 
 // const Person = require('./models/Person');
 // const MenuItem = require('./models/MenuItem');
@@ -35,11 +39,45 @@ app.use(bodyParser.json());                     //body parser extracts the json 
 const PORT = process.env.PORT || 3000;
 
 
-/*
-app.get('/', function (req, res) {
-  res.send('Hello World')
-})
+//middleware function
+const logRequest = (req, res, next)=>{
+  console.log(`[${new Date().toLocaleString()}] Request made to: ${req.originalUrl}`);
+  next();           //move to the next phase (if there is no next phase i.e. no middleware func. return the response to the client)
+}
+app.use(logRequest);                //middleware function that is used for all the routes
 
+
+
+passport.use(new LocalStrategy(async(USERNAME, password, done)=>{
+  //authentication logic here
+  try{
+    console.log('Received credentials:',USERNAME, password);
+    const user = await SignUp.findOne({username: USERNAME});
+    if(!user)
+      return done(null, false, {message:'Incorrect email.'});
+    const isPasswordMatch = user.password === password? true: false;
+    if(isPasswordMatch){
+      return done(null, user);
+    }else{
+      return done(null, false, {message:'Incorrect Password.'})
+    }
+  }
+  catch(err){
+    return done(err);
+  }
+}))
+
+app.use(passport.initialize());
+
+
+
+app.get('/', passport.authenticate('local', { session: false }), function (req, res) {
+  res.send('Hello World');
+});
+
+
+
+/*
 app.get('/aboutUs', (req, res)=>{
   res.send("Hey there!! We are the creators of StackBid");
 })
@@ -126,6 +164,8 @@ const signUpRoutes = require('./routes/signUpRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const uploadItemRoutes = require('./routes/uploadItemRoutes');
 const bidRoutes = require('./routes/bidRoutes');
+const HistorySellerRoutes = require('./routes/HistorySellerRoutes');
+const FeedbackRoutes = require('./routes/FeedbackRoutes'); 
 
 //Use the routers
 app.use('/person', personRoutes);
@@ -134,6 +174,8 @@ app.use('/SignUp', signUpRoutes);
 app.use('/Profile',profileRoutes);
 app.use('/UploadItem',uploadItemRoutes);
 app.use('/bidrecord', bidRoutes);
+app.use('/SellerHistory',HistorySellerRoutes);
+app.use('/Feedback', FeedbackRoutes);
 
 
 app.listen(PORT, ()=>{
