@@ -1,29 +1,21 @@
-//Set up Passport with local authentication strategy, using the SignUp model
-
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;         //username and passsword strategy
+const LocalStrategy = require('passport-local').Strategy;
 const SignUp = require('./models/SignUp');
 
-
-
-passport.use(new LocalStrategy(async(USERNAME, password, done)=>{
-  //authentication logic here
-  try{
-    //console.log('Received credentials:',USERNAME, password);
-    const user = await SignUp.findOne({username: USERNAME});
-    if(!user)
-      return done(null, false, {message:'Incorrect username'});
-    const isPasswordMatch = user.comparePassword(password);
-    if(isPasswordMatch){
-      return done(null, user);
-    }else{
-      return done(null, false, {message:'Incorrect Password.'})
+passport.use(new LocalStrategy(async (username, password, done) => {
+    try {
+        const user = await SignUp.findOne({ username });
+        if (!user) {
+            return done(null, false, { message: 'Incorrect username' });
+        }
+        const isPasswordMatch = await user.comparePassword(password);
+        if (!isPasswordMatch) {
+            return done(null, false, { message: 'Incorrect password' });
+        }
+        return done(null, user); // Authentication successful
+    } catch (err) {
+        return done(err);
     }
-  }
-  catch(err){
-    return done(err);
-  }
-}))
+}));
 
-module.exports = passport;                                              //Export configured passport
-
+module.exports = passport;
