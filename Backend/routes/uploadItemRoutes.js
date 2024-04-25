@@ -18,8 +18,10 @@ router.post('/', async (req, res) => {
     }
 });
 
+
+//const localAuthMiddleware = passport.authenticate('local', { session: false })
 // GET method to retrieve all items
-router.get('/', passport.authenticate('local', { session: false }), async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const items = await UploadItem.find(); // Retrieve all items from UploadItem collection
         console.log('Items fetched from UploadItem collection');

@@ -23,12 +23,11 @@ const express = require('express')
 const app = express()
 const db = require('./db')                          //Connection of nodejs with mongodb
 require ('dotenv').config();
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;         //username and passsword strategy
+const passport = require('./auth');
 const SignUp = require('./models/SignUp');
 
 
-// const Person = require('./models/Person');
+//const Person = require('./models/Person');
 // const MenuItem = require('./models/MenuItem');
 // const SignUp = require('./models/SignUp');
 // const SignIn = require('./models/SignIn');
@@ -42,36 +41,16 @@ const PORT = process.env.PORT || 3000;
 //middleware function
 const logRequest = (req, res, next)=>{
   console.log(`[${new Date().toLocaleString()}] Request made to: ${req.originalUrl}`);
-  next();           //move to the next phase (if there is no next phase i.e. no middleware func. return the response to the client)
+  next();                         //move to the next phase (if there is no next phase i.e. no middleware func. return the response to the client)
 }
 app.use(logRequest);                //middleware function that is used for all the routes
 
 
-
-passport.use(new LocalStrategy(async(USERNAME, password, done)=>{
-  //authentication logic here
-  try{
-    console.log('Received credentials:',USERNAME, password);
-    const user = await SignUp.findOne({username: USERNAME});
-    if(!user)
-      return done(null, false, {message:'Incorrect email.'});
-    const isPasswordMatch = user.password === password? true: false;
-    if(isPasswordMatch){
-      return done(null, user);
-    }else{
-      return done(null, false, {message:'Incorrect Password.'})
-    }
-  }
-  catch(err){
-    return done(err);
-  }
-}))
-
 app.use(passport.initialize());
+const localAuthMiddleware = passport.authenticate('local', { session: false })    //authentication using username and password from siginUp (code present in auth.js for authentication)
 
 
-
-app.get('/', passport.authenticate('local', { session: false }), function (req, res) {
+app.get('/', localAuthMiddleware, function (req, res) {
   res.send('Hello World');
 });
 
@@ -168,14 +147,15 @@ const HistorySellerRoutes = require('./routes/HistorySellerRoutes');
 const FeedbackRoutes = require('./routes/FeedbackRoutes'); 
 
 //Use the routers
-app.use('/person', personRoutes);
+app.use('/person',localAuthMiddleware,personRoutes);
 app.use('/SignIn', signInRoutes);
 app.use('/SignUp', signUpRoutes);
-app.use('/Profile',profileRoutes);
-app.use('/UploadItem',uploadItemRoutes);
-app.use('/bidrecord', bidRoutes);
-app.use('/SellerHistory',HistorySellerRoutes);
-app.use('/Feedback', FeedbackRoutes);
+//Following below routes requires authentication
+app.use('/Profile',localAuthMiddleware,profileRoutes);
+app.use('/UploadItem',localAuthMiddleware, uploadItemRoutes);
+app.use('/bidrecord',localAuthMiddleware, bidRoutes);
+app.use('/SellerHistory',localAuthMiddleware, HistorySellerRoutes);
+app.use('/Feedback', localAuthMiddleware, FeedbackRoutes);
 
 
 app.listen(PORT, ()=>{

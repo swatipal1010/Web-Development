@@ -1,13 +1,11 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const signUp = new mongoose.Schema({
-    firstName:{
-        type: String,
-        required : true,
-    },
-    lastName:{
+    username:{
         type: String,
         required: true,
+        unique: true,
     },
     email:{
         type:String,

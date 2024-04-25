@@ -34,7 +34,7 @@ router.get('/',async(req,res)=>{
 
 
   //SELLER or CUSTOMER endPoint for fetchng info entered during signin
-router.get('/:roleType',passport.authenticate('local', { session: false }), async(req,res)=>{
+router.get('/:roleType', async(req,res)=>{
     try{
         const roleType = req.params.roleType;
         if(roleType=='seller' || roleType=='customer'){

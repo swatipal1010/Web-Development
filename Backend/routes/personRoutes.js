@@ -12,9 +12,16 @@ router.post('/', async (req, res) => {
         res.status(200).json(response); // Return saved response as JSON
     } catch (err) {
         console.log(err);
+
+        // Handle duplicate key error for the unique username field
+        if (err.code === 11000 && err.keyValue && err.keyValue.username) {
+            return res.status(409).json({ error: 'Username must be unique' });
+        }
+
         res.status(500).json({ error: 'Internal server error' }); // Send error response as JSON
     }
 });
+
 
 // GET method to retrieve all data of the Person
 router.get('/', async (req, res) => {
