@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Person = require('./../models/Person');
+const { jwtAuthMiddleware, generateToken } = require('./../jwt');
 
 // Using async and await
 router.post('/', async (req, res) => {
@@ -24,7 +25,7 @@ router.post('/', async (req, res) => {
 
 
 // GET method to retrieve all data of the Person
-router.get('/', async (req, res) => {
+router.get('/',jwtAuthMiddleware, async (req, res) => {
     try {
         const data = await Person.find();
         console.log('Data fetched from Person collection');

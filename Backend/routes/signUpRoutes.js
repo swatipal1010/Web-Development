@@ -67,7 +67,7 @@ router.post('/login', async (req, res) => {
 });
 
 // GET method to retrieve the data of the Seller or Customer
-router.get('/', async (req, res) => {
+router.get('/',jwtAuthMiddleware, async (req, res) => {
     try {
         const data = await SignUp.find(); // Retrieve all documents from 'SignUp' collection
         console.log('Data fetched from SignUp collection');
