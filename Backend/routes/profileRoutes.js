@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Profile = require('./../models/Profile');
-
+const { jwtAuthMiddleware, generateToken } = require('./../jwt');
 
 // POST method to create a new profile (assuming this is for creating a profile)
 router.post('/', async (req, res) => {
@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
 });
 
 // GET method to retrieve all profiles (assuming this is for fetching all profiles)
-router.get('/',async (req, res) => {
+router.get('/',jwtAuthMiddleware,async (req, res) => {
     try {
         const profiles = await Profile.find();
         console.log('Profiles fetched successfully');

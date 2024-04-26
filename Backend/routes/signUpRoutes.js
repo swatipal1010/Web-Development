@@ -9,19 +9,19 @@ router.post('/', async (req, res) => {
     try {
         const data = req.body;
         const newPerson = new SignUp(data);
-        const response = await newPerson.save(); // Wait until the data is saved
+        const response = await newPerson.save();
         console.log('Response saved');
-        const payload={
+        const payload = {
             id: response.id,
             username: response.username
         }
         console.log(JSON.stringify(payload));
         const token = generateToken(payload);
         console.log("Token is: ", token);
-        res.status(200).json({ response: response, token: token }); // Response is returned in JSON format
+        res.status(200).json({ response: response, token: token });
     } catch (err) {
         console.log(err);
-        res.status(500).json({ error: 'Internal server error' }); // Send error response as JSON with status 500
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -29,47 +29,45 @@ router.post('/', async (req, res) => {
 //Login Route
 router.post('/login', async (req, res) => {
     try {
-        // Extract username and password from body
         const { username, password } = req.body;
-
-        // Find the user by username
         const user = await SignUp.findOne({ username });
-
-        // If user doesn't exist, return error
         if (!user) {
             return res.status(401).json({ error: 'Invalid username or password' });
         }
-
-        // Compare the provided password with the hashed password in the database
         const isMatch = await user.comparePassword(password);
-
-        // If passwords don't match, return error
         if (!isMatch) {
             return res.status(401).json({ error: 'Invalid username or password' });
         }
-
-        // If username and password are correct, generate the token for the user
         const payload = {
             id: user.id,
             username: user.username
         };
-
-        // Generate token
         const token = generateToken(payload);
-
-        // Return token as response
         res.json({ token });
-
     } catch (err) {
         console.log(err);
-        res.status(500).json({ error: 'Internal server error' }); // Send error response as JSON with status 500
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+//Profile route specific to each user
+router.get('/profile', jwtAuthMiddleware, async (req, res) => {
+    try {
+        const userData = res.user;
+        console.log('User data:', userData);
+        const userId = userData.id;
+        const user = await SignUp.findById(userId);
+        res.status(200).json({ user }); // Send user details as response
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
 // GET method to retrieve the data of the Seller or Customer
-router.get('/',jwtAuthMiddleware, async (req, res) => {
+router.get('/', jwtAuthMiddleware, async (req, res) => {
     try {
-        const data = await SignUp.find(); // Retrieve all documents from 'SignUp' collection
+        const data = await SignUp.find();
         console.log('Data fetched from SignUp collection');
         res.status(200).json(data);
     } catch (err) {
@@ -77,7 +75,6 @@ router.get('/',jwtAuthMiddleware, async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
 
 // SELLER or CUSTOMER endPoint for fetching info entered during signup
 router.get('/:roleType', async (req, res) => {
