@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const UploadItem = require('./../models/UploadItem');       
 const passport = require('passport');
-
+const { jwtAuthMiddleware, generateToken } = require('./../jwt');
 
 // POST method to save a new item
 router.post('/', async (req, res) => {
@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
 
 //const localAuthMiddleware = passport.authenticate('local', { session: false })
 // GET method to retrieve all items
-router.get('/', async (req, res) => {
+router.get('/',jwtAuthMiddleware, async (req, res) => {
     try {
         const items = await UploadItem.find(); // Retrieve all items from UploadItem collection
         console.log('Items fetched from UploadItem collection');

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const Feedback = require("../models/Feedback");
+const { jwtAuthMiddleware, generateToken } = require('./../jwt');
 
 router.post("/", async (req, res) => {
   try {
@@ -17,7 +18,7 @@ router.post("/", async (req, res) => {
 });
 
 //GET method to retrieve the data of the Seller or Customer
-router.get("/", async (req, res) => {
+router.get("/", jwtAuthMiddleware,async (req, res) => {
   try {
     const data = await Feedback.find(); //all documents are retrieved from 'Person' collection
     console.log("Data fetched from Person collection");

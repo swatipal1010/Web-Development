@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const HistorySeller = require("./../models/HistorySeller"); 
-
+const { jwtAuthMiddleware, generateToken } = require('./../jwt');
 
 
 router.post("/", async (req, res) => {
@@ -18,7 +18,7 @@ router.post("/", async (req, res) => {
 });
 
 //GET method to retrieve the data of the Seller or Customer
-router.get("/", async (req, res) => {
+router.get("/", jwtAuthMiddleware,async (req, res) => {
   try {
     const data = await HistorySeller.find(); //all documents are retrieved from 'Person' collection
     console.log("Data fetched from Person collection");

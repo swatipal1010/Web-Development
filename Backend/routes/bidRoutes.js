@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const BidRecord = require('./../models/BidRecord');
+const { jwtAuthMiddleware, generateToken } = require('./../jwt');
 
 //Using async and await
 router.post('/',async(req,res)=>{
@@ -19,7 +20,7 @@ router.post('/',async(req,res)=>{
 
 
   //GET method to retrieve the data of the Person
-router.get('/',async(req,res)=>{
+router.get('/',jwtAuthMiddleware,async(req,res)=>{
     try{
       const data = await BidRecord.find();                 //all documents are retrieved from 'Person' collection
       console.log('Data fetched from Person collection');
