@@ -7,7 +7,7 @@ const jwtAuthMiddleware = (req, res, next) => {
 
     try {
         // Verify the token
-        const decoded = jwt.verify(token, process.env.JWT_TOKEN);
+        const decoded = jwt.verify(token, process.env.JWT_TOKEN, {expiresIn: 30});
         res.user = decoded;
         next();
 
