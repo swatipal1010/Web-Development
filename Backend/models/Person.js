@@ -40,7 +40,7 @@ const personSchema = new mongoose.Schema({
 
 
 
-personSchema.pre('save', async function(next){          //This is the person that executes before data gets saved in the database
+personSchema.pre('save', async function(next){          //'pre' is the function that executes when save operation gets triggered
     const person = this;
     //hash the password only if has been modified or it is new
     if(!person.isModified('password')) return next();

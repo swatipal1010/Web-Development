@@ -3,6 +3,10 @@ const app = express();
 const passport = require('./auth');
 const bodyParser = require('body-parser');
 const PORT = process.env.PORT || 3000;
+//const Person = require('./models/Person');
+
+// Import the database connection
+const db = require('./db');
 
 // Middleware
 app.use(bodyParser.json());
@@ -31,11 +35,11 @@ app.use('/SignIn', signInRoutes);
 app.use('/SignUp', signUpRoutes);
 
 // Protected routes (require authentication)
-app.use('/Profile', passport.authenticate('local', { session: false }), profileRoutes);
-app.use('/UploadItem', passport.authenticate('local', { session: false }), uploadItemRoutes);
-app.use('/bidrecord', passport.authenticate('local', { session: false }), bidRoutes);
-app.use('/SellerHistory', passport.authenticate('local', { session: false }), HistorySellerRoutes);
-app.use('/Feedback', passport.authenticate('local', { session: false }), FeedbackRoutes);
+app.use('/Profile', profileRoutes);
+app.use('/UploadItem', uploadItemRoutes);
+app.use('/bidrecord', bidRoutes);
+app.use('/SellerHistory', HistorySellerRoutes);
+app.use('/Feedback', FeedbackRoutes);
 
 // Default route
 app.get('/', (req, res) => {
