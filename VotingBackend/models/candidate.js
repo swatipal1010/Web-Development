@@ -18,11 +18,11 @@ const candidateSchema = new mongoose.Schema({
         type:Number,
         required: true
     },
-    votes: [
+    votes: [                                                //array of objects
         {
             user: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User',
+                type: mongoose.Schema.Types.ObjectId,       //user gets the id that mongodb assigns at the time of record creation
+                ref: 'User',                                //where does this id come from? -> From 'User' table
                 required: true
             },
             votedAt: {
