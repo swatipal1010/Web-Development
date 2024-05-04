@@ -2,12 +2,26 @@ const express = require('express');
 const router = express.Router();
 const Candidate = require('../models/candidate');
 const { jwtAuthMiddleware, generateToken } = require('../jwt');
+const User = require('../models/user');                             // Import the User model
 
+const checkAdminRole = async(userId)=>{
+    try{
+        const user = await User.findById(userId);
+        if(user.role === 'admin'){
+            return true;
+        };
+    }catch(err){
+        return false;
+    }
+}
 
 // POST route to add a candidate
-router.post('/', async (req, res) => {
+router.post('/',jwtAuthMiddleware, async (req, res) => {
     try {
-        const data = req.body;          //Extract the data from the request body
+        if(! await checkAdminRole(req.user.id))
+            return res.status(403).json({message: 'User has no admin role.'});
+
+        const data = req.body;          //Assuming the request body contains the candidate's data
 
         //create a new Candidate document using the mongoose model
         const newCandidate = new Candidate(data);
@@ -24,48 +38,125 @@ router.post('/', async (req, res) => {
 });
 
 
-//Profile route specific to each user
-router.get('/profile', jwtAuthMiddleware, async (req, res) => {
+//PUT method to change the details of the candidate. Action can be performed by the admin only.
+router.put('/:candidateID',jwtAuthMiddleware, async(req,res)=>{
     try {
-        const userData = res.user;
-        console.log('User data:', userData);
-        const userId = userData.id;
-        const user = await User.findById(userId);
-        res.status(200).json({ user }); // Send user details as response
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
+        if(!checkAdminRole(req.user.id))
+            return res.status(403).json({message: 'User has no admin role.'});
 
+        const candidateID = req.params.candidateID;
+        const updatedCandidateData = req.body;
+        const response = await Person.findByIdAndUpdate(candidateID, updatedCandidateData, {
+            new: true,
+            runValidators: true,
+        });
 
-//PUT method to change the password of the user --> Profile can be used to change the password of the user
-router.put('/profile/password',jwtAuthMiddleware, async(req,res)=>{
-    try {
-        const userId = req.user;        //Extract the user id from the token
-        const {currentPassword, newPassword}= req.body; //Extract the current password and new password from the request body   
-
-        //Find the user by userId
-        const user = await User.findById(userId);
-
-        //If password doesn't match, return error
-        const isMatch = await user.comparePassword(currentPassword);
-        if (!isMatch) {
-            return res.status(401).json({ error: 'Invalid username or password' });
+        if (!response) {
+            return res.status(404).json({ error: 'Candidate not found' });
         }
-        //Update the user password (done after the old password is verified)
-        user.password = newPassword;
-        await user.save();
 
-
-        console.log('Password updated.');
-        res.status(200).json({ message: "Password updated" }); // Return updated response as JSON
+        console.log('Candidate Data updated.');
+        res.status(200).json(response); // Return updated response as JSON
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: 'Internal server error' }); // Send error response as JSON
     }
 })
 
+
+
+//DELETE method to delete the details of the candiadet. Action can be performed by the admin only.
+router.delete('/:candidateID',jwtAuthMiddleware, async(req,res)=>{
+    try {
+        if(!checkAdminRole(req.user.id))
+            return res.status(404).json({message: 'User has no admin role.'});
+
+        const candidateID = req.params.candidateID;
+        const response = await Person.findByIdAndDelete(candidateID);
+
+        if (!response) {
+            return res.status(404).json({ error: 'Candidate not found' });
+        }
+
+        console.log('Candidate deleted.');
+        res.status(200).json(response); // Return updated response as JSON
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal server error' }); // Send error response as JSON
+    }
+})
+
+
+//Let's start voting
+router.post('/vote/:candidateID',jwtAuthMiddleware, async(req,res)=>{
+    //No admin can vote
+    ///User can vote only once
+    candidateID = req.params.candidateID;
+    userId = req.user.id;
+    try {
+        //find the candidate document with the specified candidateID
+        const candidate = await Candidate.findById(candidateID);
+        if(!candidate){
+            return res.status(404).json({error: 'Candidate not found'});
+        }
+
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(404).json({error: 'User not found'});
+        }
+        if(user.isVoted){
+            return res.status(403).json({error: 'You has already voted'});
+        }
+        if(user.role=='admin'){
+            return res.status(403).json({error: 'Admin cannot vote'});
+        }
+
+        //Update the candidate document to record the vote
+        candidate.votes.push({user:userId});
+        candidate.voteCount++;
+        await candidate.save();
+
+        //update the user document
+        user.isVoted = true;
+        await user.save();
+
+        res.status(200).json({message: 'Vote recorded'});
+
+    }catch(err){
+        return res.status(500).json({error: 'Internal server error'});
+    }
+})
+
+
+//Vote Count
+router.get('/vote/count', async(req,res)=>{
+    try{
+        //find all candidates and sort them in descending order of the voteCount
+        const candidate = await Candidate.find().sort({voteCount: 'desc'});
+
+        //map the candidates to only return their name and vote count
+        const voteRecord = candidate.map((data)=>{
+            return {
+                party: data.party,
+                count: data.voteCount
+            }
+        });
+        return res.status(200).json(voteRecord);
+    }catch(err){
+        return res.status(500).json({error: 'Internal server error'});
+    }
+})
+
+
+//Get the candidate list
+router.get('/candidate', async(req,res)=>{
+    try{
+        //list of candidates
+        
+    }catch(err){
+        return res.status(500).json({error: 'Internal server error'});
+    }
+})
 
 
 module.exports = router;
